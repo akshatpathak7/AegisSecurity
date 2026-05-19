@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Quiz &middot; Aegis AI{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="page-header">
+        <h1>Security Quiz</h1>
+        <p>Test your ability to recognize and respond to social engineering attacks.</p>
+    </div>
+
+    <div class="quiz-layout">
+        <!-- Start -->
+        <div id="quizStart" class="card">
+            <div class="quiz-start">
+                <div class="quiz-start-icon">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M10 9.5a2 2 0 012-2h0a2 2 0 012 2c0 1.33-2 1.67-2 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="15.5" r="0.75" fill="currentColor"/></svg>
+                </div>
+                <h2>Ready?</h2>
+                <p>10 multiple-choice questions on identification, prevention, and real-world scenarios.</p>
+                <button class="btn btn-primary btn-lg" onclick="startQuiz()">Start quiz</button>
+            </div>
+        </div>
+
+        <!-- Active quiz -->
+        <div id="quizArea" style="display:none;">
+            <div class="quiz-progress">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+                <span class="progress-label" id="progressText">1 / 10</span>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText"></div>
+                <div class="quiz-options" id="optionsContainer"></div>
+                <div class="quiz-explanation" id="explanation"></div>
+            </div>
+
+            <div class="quiz-nav">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">
+                    Next
+                    <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="quizResults" style="display:none;">
+            <div class="card quiz-results">
+                <div class="score-ring" id="scoreCircle">
+                    <span class="score-value" id="scoreNumber">0%</span>
+                    <span class="score-unit">Score</span>
+                </div>
+                <h2 id="scoreMessage">Results</h2>
+                <p class="results-sub" id="scoreDetail"></p>
+                <div class="results-actions">
+                    <button class="btn btn-primary" onclick="startQuiz()">Retry</button>
+                    <a href="/library" class="btn btn-secondary">Study library</a>
+                </div>
+
+                <div id="resultsBreakdown"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+{% endblock %}

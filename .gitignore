@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+data/app.db
+model/model.pkl
+model/vectorizer.pkl
+data/dataset.csv
+.remember/
+*.log
+.DS_Store
+venv/
+.env

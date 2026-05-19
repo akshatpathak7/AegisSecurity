@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Aegis AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            ML-powered threat analysis
+        </div>
+        <h1>Detect social engineering before it reaches you</h1>
+        <p class="hero-sub">Analyze messages, emails, and voice recordings for manipulation patterns. Learn to identify attacks and protect yourself.</p>
+        <div class="hero-actions">
+            <a href="/detect" class="btn btn-primary btn-lg">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M14 14l-3.5-3.5M6.5 11a4.5 4.5 0 100-9 4.5 4.5 0 000 9z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Analyze a message
+            </a>
+            <a href="/library" class="btn btn-secondary btn-lg">Browse attack library</a>
+        </div>
+    </section>
+
+    <div class="features-grid">
+        <a href="/detect" class="feature-item">
+            <div class="feature-item-icon">
+                <svg viewBox="0 0 18 18" fill="none"><path d="M16 16l-3.5-3.5M7.5 13a5.5 5.5 0 100-11 5.5 5.5 0 000 11z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <h3>Threat Detection</h3>
+            <p>Submit text, emails, or audio. Our classifier identifies phishing, vishing, smishing, pretexting, and more.</p>
+            <span class="feature-link">Start analysis <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="/library" class="feature-item">
+            <div class="feature-item-icon">
+                <svg viewBox="0 0 18 18" fill="none"><path d="M3 4.5h12M3 9h12M3 13.5h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <h3>Attack Library</h3>
+            <p>Eight attack types documented with identification guides, prevention checklists, and embedded video explainers.</p>
+            <span class="feature-link">Explore library <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="/quiz" class="feature-item">
+            <div class="feature-item-icon">
+                <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 7.5a1.5 1.5 0 011.5-1.5h0a1.5 1.5 0 011.5 1.5c0 1-1.5 1.25-1.5 2.25" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="9" cy="12" r="0.5" fill="currentColor"/></svg>
+            </div>
+            <h3>Knowledge Quiz</h3>
+            <p>Ten randomized questions covering identification, prevention, and real-world attack scenarios. Instant feedback.</p>
+            <span class="feature-link">Take the quiz <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Guidance &middot; Aegis AI{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <a href="/detect" class="back-link">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to detection
+    </a>
+
+    {% if attack %}
+    <div class="guidance-banner">
+        <div class="guidance-banner-icon">
+            <svg viewBox="0 0 18 18" fill="none"><path d="M9 2L2 16h14L9 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 7v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="9" cy="13" r="0.6" fill="currentColor"/></svg>
+        </div>
+        <div>
+            <h3>Potential {{ attack.name }} detected</h3>
+            <p>The content you submitted matches patterns associated with {{ attack.name|lower }} attacks. Review the guidance below.</p>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <div class="detail-section-title">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="11" r="0.6" fill="currentColor"/></svg>
+            What this means
+        </div>
+        <div class="card">
+            <p style="font-size:0.875rem; color:var(--text-secondary); line-height:1.75;">
+                A <strong style="color:var(--text-primary); font-weight:580;">{{ attack.name }}</strong> attack was identified in your submission.
+                This technique manipulates victims into revealing sensitive information, granting unauthorized access,
+                or taking actions that compromise security. The content matches patterns consistent with known {{ attack.name|lower }} methods.
+            </p>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <div class="detail-section-title">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 5v4c0 4.5 2.56 8.7 6 9.5 3.44-0.8 6-5 6-9.5V5L8 1.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 8l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Immediate steps
+        </div>
+        <div class="card">
+            <ul class="detail-list">
+                {% for item in attack.victim_steps.split('\n') %}
+                    {% if item.strip() %}
+                    <li>{{ item.strip().lstrip('•').strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <div class="detail-section-title">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 3h10M3 6.5h7M3 10h10M3 13.5h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Prevention
+        </div>
+        <div class="card">
+            <ul class="detail-list">
+                {% for item in attack.how_to_prevent.split('\n') %}
+                    {% if item.strip() %}
+                    <li>{{ item.strip().lstrip('•').strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <div class="detail-section-title">
+            <svg viewBox="0 0 16 16" fill="none"><polygon points="8,1 10,5.5 15,6 11.5,9.5 12.5,14.5 8,12 3.5,14.5 4.5,9.5 1,6 6,5.5" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linejoin="round"/></svg>
+            Understanding {{ attack.name }}
+        </div>
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div class="video-embed">
+                <iframe
+                    src="https://www.youtube.com/embed/{{ attack.youtube_video_id }}"
+                    title="{{ attack.name }} explained"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:12px;">
+        <a href="/library/{{ attack.slug }}" class="btn btn-secondary">
+            View full {{ attack.name }} guide
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+    </div>
+
+    {% else %}
+    <div class="card" style="text-align:center; padding:48px 24px;">
+        <p class="t-title" style="margin-bottom:6px;">No threat information available</p>
+        <p class="t-small text-secondary" style="margin-bottom:20px;">The attack type wasn't found. Use the detector to analyze content.</p>
+        <a href="/detect" class="btn btn-primary">Go to detection</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
