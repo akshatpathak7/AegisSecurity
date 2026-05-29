@@ -2,6 +2,8 @@
 
 A Flask web app for social engineering awareness, detection, a learning library, and quizzes.
 
+The production deploy installs the core app only. Voice transcription is optional because Whisper and Torch are large dependencies and can fail or exceed limits on free hosts.
+
 ## Local Setup
 
 ```bash
@@ -26,7 +28,7 @@ gunicorn app:app --bind 0.0.0.0:${PORT:-8000}
 Use this build/setup command before the app starts:
 
 ```bash
-pip install -r requirements.txt && python init_db.py && python model/train.py
+python -m pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && python init_db.py && python model/train.py
 ```
 
 The app also bootstraps missing `data/app.db`, `model/model.pkl`, and `model/vectorizer.pkl` on startup by default. Set `AEGIS_AUTO_BOOTSTRAP=0` if you prefer startup to fail when build artifacts are missing.
@@ -43,4 +45,10 @@ The health check endpoint is `/healthz`.
 
 ## Notes
 
-Voice detection uses `openai-whisper`, `torch`, and system `ffmpeg`. This repo includes `apt.txt` for hosts that install apt packages during deploy. Text, email, library, and quiz features do not need `ffmpeg`.
+Voice detection uses `openai-whisper`, `torch`, and system `ffmpeg`. To enable it on a host with enough memory/storage, install the optional dependencies:
+
+```bash
+pip install -r requirements-voice.txt
+```
+
+This repo includes `apt.txt` for hosts that install apt packages during deploy. Text, email, library, and quiz features do not need `ffmpeg`.
