@@ -1,7 +1,8 @@
 import os
-import json
+import logging
 import sqlite3
 import tempfile
+
 import joblib
 import numpy as np
 from flask import Flask, render_template, request, jsonify, g
@@ -13,6 +14,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'data', 'app.db')
 MODEL_PATH = os.path.join(BASE_DIR, 'model', 'model.pkl')
 VECTORIZER_PATH = os.path.join(BASE_DIR, 'model', 'vectorizer.pkl')
+AUTO_BOOTSTRAP = os.environ.get('AEGIS_AUTO_BOOTSTRAP', '1') != '0'
+
+logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO'))
+logger = logging.getLogger(__name__)
 
 ATTACK_TYPES = {
     'phishing': 'Phishing',
@@ -27,6 +32,7 @@ ATTACK_TYPES = {
 
 
 def get_db():
+    ensure_database()
     if 'db' not in g:
         g.db = sqlite3.connect(DB_PATH)
         g.db.row_factory = sqlite3.Row
@@ -44,11 +50,32 @@ model = None
 vectorizer = None
 
 
+def ensure_database():
+    if os.path.exists(DB_PATH):
+        return
+    if not AUTO_BOOTSTRAP:
+        raise RuntimeError(f'Database not found at {DB_PATH}. Run python init_db.py before starting the app.')
+
+    from init_db import init_db
+
+    logger.info('Database not found. Initializing SQLite database.')
+    init_db()
+
+
 def load_model():
     global model, vectorizer
-    if os.path.exists(MODEL_PATH) and os.path.exists(VECTORIZER_PATH):
-        model = joblib.load(MODEL_PATH)
-        vectorizer = joblib.load(VECTORIZER_PATH)
+    if not os.path.exists(MODEL_PATH) or not os.path.exists(VECTORIZER_PATH):
+        if not AUTO_BOOTSTRAP:
+            logger.warning('Model artifacts are missing and automatic bootstrap is disabled.')
+            return
+
+        from model.train import train_model
+
+        logger.info('Model artifacts not found. Training classifier.')
+        train_model()
+
+    model = joblib.load(MODEL_PATH)
+    vectorizer = joblib.load(VECTORIZER_PATH)
 
 
 def classify_text(text):
@@ -59,8 +86,6 @@ def classify_text(text):
     prediction = model.predict(text_vectorized)[0]
     probabilities = model.predict_proba(text_vectorized)[0]
     confidence = float(np.max(probabilities))
-
-    classes = model.classes_.tolist()
 
     if prediction == 'safe':
         return {
@@ -93,6 +118,15 @@ def transcribe_audio(audio_file):
 
 
 # --- Routes ---
+
+@app.route('/healthz')
+def healthz():
+    return jsonify({
+        'ok': True,
+        'database': os.path.exists(DB_PATH),
+        'model': model is not None and vectorizer is not None
+    })
+
 
 @app.route('/')
 def index():
@@ -257,6 +291,7 @@ def search_library():
 
 
 with app.app_context():
+    ensure_database()
     load_model()
 
 
