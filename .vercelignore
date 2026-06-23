@@ -1,0 +1,14 @@
+# Render-only deployment files are not needed by Vercel.
+Procfile
+render.yaml
+apt.txt
+runtime.txt
+
+# Local/runtime cache files.
+__pycache__/
+*.pyc
+.DS_Store
+.remember/
+*.log
+venv/
+.env

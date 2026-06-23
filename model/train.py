@@ -1,6 +1,7 @@
 import os
-import pandas as pd
-import numpy as np
+import csv
+from collections import Counter
+
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -232,20 +233,30 @@ def create_dataset():
     for text in safe_examples:
         data.append({'text': text, 'label': 'safe'})
 
-    return pd.DataFrame(data)
+    return data
 
 
 def train_model():
     print("Creating dataset...")
-    df = create_dataset()
+    records = create_dataset()
+    texts = [record['text'] for record in records]
+    labels = [record['label'] for record in records]
 
     os.makedirs(os.path.dirname(DATA_PATH), exist_ok=True)
-    df.to_csv(DATA_PATH, index=False)
-    print(f"Dataset saved: {len(df)} samples")
-    print(f"Label distribution:\n{df['label'].value_counts()}\n")
+    with open(DATA_PATH, 'w', newline='', encoding='utf-8') as dataset_file:
+        writer = csv.DictWriter(dataset_file, fieldnames=['text', 'label'])
+        writer.writeheader()
+        writer.writerows(records)
+
+    label_distribution = Counter(labels)
+    distribution_text = "\n".join(
+        f"{label}: {count}" for label, count in label_distribution.most_common()
+    )
+    print(f"Dataset saved: {len(records)} samples")
+    print(f"Label distribution:\n{distribution_text}\n")
 
     X_train, X_test, y_train, y_test = train_test_split(
-        df['text'], df['label'], test_size=0.2, random_state=42, stratify=df['label']
+        texts, labels, test_size=0.2, random_state=42, stratify=labels
     )
 
     print("Training TF-IDF vectorizer...")

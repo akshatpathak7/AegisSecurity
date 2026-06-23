@@ -2,6 +2,7 @@ import os
 import logging
 import sqlite3
 import tempfile
+import shutil
 
 import joblib
 import numpy as np
@@ -11,7 +12,12 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'data', 'app.db')
+LOCAL_DB_PATH = os.path.join(BASE_DIR, 'data', 'app.db')
+SEED_DB_PATH = LOCAL_DB_PATH
+
+# Vercel serverless functions can only write safely to /tmp at runtime.
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+DB_PATH = os.path.join('/tmp', 'app.db') if IS_VERCEL else LOCAL_DB_PATH
 MODEL_PATH = os.path.join(BASE_DIR, 'model', 'model.pkl')
 VECTORIZER_PATH = os.path.join(BASE_DIR, 'model', 'vectorizer.pkl')
 AUTO_BOOTSTRAP = os.environ.get('AEGIS_AUTO_BOOTSTRAP', '1') != '0'
@@ -53,6 +59,19 @@ vectorizer = None
 def ensure_database():
     if os.path.exists(DB_PATH):
         return
+
+    if IS_VERCEL:
+        if not os.path.exists(SEED_DB_PATH):
+            raise RuntimeError(
+                f'Bundled seed database not found at {SEED_DB_PATH}. '
+                'Commit data/app.db before deploying to Vercel.'
+            )
+
+        # Vercel runtime is read-only except /tmp, so bootstrap from the bundled seed.
+        shutil.copyfile(SEED_DB_PATH, DB_PATH)
+        logger.info('Copied bundled SQLite database to %s for Vercel runtime.', DB_PATH)
+        return
+
     if not AUTO_BOOTSTRAP:
         raise RuntimeError(f'Database not found at {DB_PATH}. Run python init_db.py before starting the app.')
 
@@ -65,6 +84,12 @@ def ensure_database():
 def load_model():
     global model, vectorizer
     if not os.path.exists(MODEL_PATH) or not os.path.exists(VECTORIZER_PATH):
+        if IS_VERCEL:
+            raise RuntimeError(
+                'Model artifacts are required on Vercel. '
+                'Commit model/model.pkl and model/vectorizer.pkl before deploying.'
+            )
+
         if not AUTO_BOOTSTRAP:
             logger.warning('Model artifacts are missing and automatic bootstrap is disabled.')
             return
